@@ -2,10 +2,6 @@ import { MongoClient, Db } from "mongodb";
 
 const uri = process.env.MONGODB_URI as string | undefined;
 
-if (!uri) {
-  throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
-}
-
 type Cached = {
   client: MongoClient | null;
   db: Db | null;
@@ -25,6 +21,10 @@ if (!globalWithMongo._mongo) {
 }
 
 async function connectToDatabase() {
+  if (!uri) {
+    throw new Error("MONGODB_URI is not set in the environment");
+  }
+
   if (cached.client && cached.db) {
     return { client: cached.client, db: cached.db };
   }

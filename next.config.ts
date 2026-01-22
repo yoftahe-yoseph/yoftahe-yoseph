@@ -9,7 +9,12 @@ const nextConfig: NextConfig = {
   ],
   reactStrictMode: true,
   images: {
-    domains: ["your-image-domain.com"], // Add your image domains here
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "your-image-domain.com", // update to your actual image host
+      },
+    ],
   },
   env: {
     MONGODB_URI: process.env.MONGODB_URI,

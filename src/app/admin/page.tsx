@@ -1,5 +1,7 @@
 import { connectToDatabase } from "@/lib/mongodb";
 
+export const dynamic = "force-dynamic"; // avoid pre-rendering this admin page at build time
+
 type MessageDTO = {
   _id: string;
   name: string;
@@ -9,20 +11,26 @@ type MessageDTO = {
 };
 
 export default async function AdminPage() {
-  const { db } = await connectToDatabase();
-  const messages = await db
-    .collection("messages")
-    .find({})
-    .sort({ createdAt: -1 })
-    .toArray();
+  let formatted: MessageDTO[] = [];
+  try {
+    const { db } = await connectToDatabase();
+    const messages = await db
+      .collection("messages")
+      .find({})
+      .sort({ createdAt: -1 })
+      .toArray();
 
-  const formatted: MessageDTO[] = messages.map((doc) => ({
-    _id: doc._id.toString(),
-    name: String(doc.name ?? ""),
-    email: String(doc.email ?? ""),
-    message: String(doc.message ?? ""),
-    createdAt: ((doc.createdAt instanceof Date ? doc.createdAt : new Date()) as Date).toISOString(),
-  }));
+    formatted = messages.map((doc) => ({
+      _id: doc._id.toString(),
+      name: String(doc.name ?? ""),
+      email: String(doc.email ?? ""),
+      message: String(doc.message ?? ""),
+      createdAt: ((doc.createdAt instanceof Date ? doc.createdAt : new Date()) as Date).toISOString(),
+    }));
+  } catch (error) {
+    // If DB is unreachable at build or runtime, show empty state gracefully
+    formatted = [];
+  }
 
   return (
     <div className="min-h-screen bg-zinc-900 p-8">
