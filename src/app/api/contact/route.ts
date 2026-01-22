@@ -2,13 +2,38 @@ import { NextResponse } from "next/server";
 import { CORS_HEADERS } from "@/lib/cors";
 import { z } from "zod";
 import { connectToDatabase } from "@/lib/mongodb";
-import { Message } from "@/models/message";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name is required").max(120),
   email: z.string().email("Valid email is required"),
   message: z.string().min(10, "Share a bit more detail").max(2000),
 });
+
+export async function GET() {
+  try {
+    const { db } = await connectToDatabase();
+    const docs = await db
+      .collection("messages")
+      .find({})
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    const messages = docs.map(({ _id, createdAt, updatedAt, ...rest }) => ({
+      _id: _id.toString(),
+      createdAt: createdAt instanceof Date ? createdAt.toISOString() : null,
+      updatedAt: updatedAt instanceof Date ? updatedAt.toISOString() : null,
+      ...rest,
+    }));
+
+    const res = NextResponse.json({ messages });
+    Object.entries(CORS_HEADERS).forEach(([k, v]) => res.headers.set(k, v));
+    return res;
+  } catch (error) {
+    const res = NextResponse.json({ error: "Failed to load messages." }, { status: 500 });
+    Object.entries(CORS_HEADERS).forEach(([k, v]) => res.headers.set(k, v));
+    return res;
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -35,10 +60,19 @@ export async function POST(request: Request) {
     const payload = await request.json();
     const data = contactSchema.parse(payload);
 
-    await connectToDatabase();
-    await Message.create(data);
+    const { db } = await connectToDatabase();
+    const doc = {
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
-    const res = NextResponse.json({ ok: true }, { status: 201 });
+    const result = await db.collection("messages").insertOne(doc);
+
+    const res = NextResponse.json(
+      { ok: true, id: result.insertedId.toString() },
+      { status: 201 }
+    );
     Object.entries(CORS_HEADERS).forEach(([k, v]) => res.headers.set(k, v));
     return res;
   } catch (error) {

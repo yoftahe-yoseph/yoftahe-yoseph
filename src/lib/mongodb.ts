@@ -1,29 +1,46 @@
-import mongoose from "mongoose";
+import { MongoClient, Db } from "mongodb";
 
-const { MONGODB_URI } = process.env;
+const uri = process.env.MONGODB_URI as string | undefined;
 
-type MongooseCache = {
-  conn: typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
+if (!uri) {
+  throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
+}
+
+type Cached = {
+  client: MongoClient | null;
+  db: Db | null;
+  promise: Promise<{ client: MongoClient; db: Db }> | null;
 };
 
-const globalWithMongoose = global as typeof globalThis & {
-  _mongoose?: MongooseCache;
+const globalWithMongo = global as typeof globalThis & { _mongo?: Cached };
+
+let cached: Cached = globalWithMongo._mongo || {
+  client: null,
+  db: null,
+  promise: null,
 };
 
-const cached = (globalWithMongoose._mongoose ||= { conn: null, promise: null });
+if (!globalWithMongo._mongo) {
+  globalWithMongo._mongo = cached;
+}
 
-export async function connectToDatabase() {
-  if (cached.conn) return cached.conn;
-
-  if (!MONGODB_URI) {
-    throw new Error("MONGODB_URI is not set. Add it to .env.local.");
+async function connectToDatabase() {
+  if (cached.client && cached.db) {
+    return { client: cached.client, db: cached.db };
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI);
+    cached.promise = MongoClient.connect(uri as string).then((client) => {
+      const db = client.db();
+      return { client, db };
+    });
   }
 
-  cached.conn = await cached.promise;
-  return cached.conn;
+  const { client, db } = await cached.promise;
+  cached.client = client;
+  cached.db = db;
+  return { client, db };
 }
+
+export { connectToDatabase };
+export default connectToDatabase;

@@ -1,13 +1,24 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
-import { Message } from "@/models/message";
 
 export async function GET() {
   try {
-    await connectToDatabase();
-    const messages = await Message.find({}).sort({ createdAt: -1 });
-    return NextResponse.json(messages);
-  } catch {
+    const { db } = await connectToDatabase();
+    const messages = await db
+      .collection("messages")
+      .find({})
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    const formatted = messages.map(({ _id, createdAt, updatedAt, ...rest }) => ({
+      _id: _id.toString(),
+      createdAt,
+      updatedAt,
+      ...rest,
+    }));
+
+    return NextResponse.json(formatted);
+  } catch (error) {
     return NextResponse.json({ error: "Failed to fetch messages" }, { status: 500 });
   }
 }

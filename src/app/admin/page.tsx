@@ -1,19 +1,28 @@
 import { connectToDatabase } from "@/lib/mongodb";
-import { Message } from "@/models/message";
 
 type MessageDTO = {
   _id: string;
   name: string;
   email: string;
   message: string;
-  createdAt: Date;
+  createdAt: string;
 };
 
 export default async function AdminPage() {
-  await connectToDatabase();
-  const messages = await Message.find({})
+  const { db } = await connectToDatabase();
+  const messages = await db
+    .collection("messages")
+    .find({})
     .sort({ createdAt: -1 })
-    .lean<MessageDTO[]>();
+    .toArray();
+
+  const formatted: MessageDTO[] = messages.map((doc) => ({
+    _id: doc._id.toString(),
+    name: String(doc.name ?? ""),
+    email: String(doc.email ?? ""),
+    message: String(doc.message ?? ""),
+    createdAt: ((doc.createdAt instanceof Date ? doc.createdAt : new Date()) as Date).toISOString(),
+  }));
 
   return (
     <div className="min-h-screen bg-zinc-900 p-8">
@@ -21,7 +30,7 @@ export default async function AdminPage() {
         <h1 className="text-3xl font-bold text-white mb-8">Contact Messages</h1>
         
         <div className="space-y-6">
-          {messages.map((message) => (
+          {formatted.map((message) => (
             <div key={message._id} className="bg-zinc-800 rounded-lg p-6 border border-zinc-700">
               <div className="flex justify-between items-start mb-4">
                 <div>
@@ -36,7 +45,7 @@ export default async function AdminPage() {
             </div>
           ))}
           
-          {messages.length === 0 && (
+          {formatted.length === 0 && (
             <p className="text-zinc-400 text-center py-12">No messages yet.</p>
           )}
         </div>
