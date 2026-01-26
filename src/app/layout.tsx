@@ -54,11 +54,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Navbar />
-        <main>
-          <SectionWrapper className="pt-8">{children}</SectionWrapper>
-        </main>
-        <Footer />
+        <div id="app-root" className="app-root">
+          <Navbar />
+          <main>
+            <SectionWrapper className="pt-8">{children}</SectionWrapper>
+          </main>
+          <Footer />
+        </div>
       </body>
     </html>
   );
