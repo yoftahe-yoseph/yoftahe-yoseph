@@ -11,7 +11,7 @@ const nav = [
   { href: "/contact", label: "Contact" },
 ];
 
-export default function Header() {
+export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   return (
@@ -48,12 +48,7 @@ export default function Header() {
           })}
         </nav>
       </div>
-      {/* Mobile drawer */}
-      <div
-        className={`md:hidden ${open ? "block" : "hidden"}`}
-        role="dialog"
-        aria-modal="true"
-      >
+      <div className={`md:hidden ${open ? "block" : "hidden"}`} role="dialog" aria-modal="true">
         <nav className="mx-auto max-w-6xl px-6 pb-3">
           <div className="glass rounded-xl p-3">
             {nav.map((item) => {

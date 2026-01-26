@@ -1,10 +1,24 @@
 @import "tailwindcss";
 
+/* Design tokens */
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --accent: #10b981;
-  --accent-hover: #059669;
+  --background: #05060a;
+  --surface: #0d1117;
+  --muted: #94a3b8;
+  --border: #1f2937;
+  --foreground: #e5e7eb;
+  --accent: #22d3ee;
+  --accent-strong: #10b981;
+  --accent-hover: #0ea5e9;
+  --ring: rgba(34, 211, 238, 0.35);
+
+  /* 8px spacing scale (multiples of 0.5rem) */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 2.5rem;
+  --space-6: 3rem;
 }
 
 @theme inline {
@@ -23,10 +37,91 @@ html {
 }
 
 body {
-  background: var(--background);
+  background: radial-gradient(circle at 20% 20%, rgba(34, 211, 238, 0.08), transparent 25%),
+    radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.1), transparent 22%),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+  line-height: 1.6;
   overflow-x: hidden;
+}
+
+main {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+a,
+button,
+input,
+textarea {
+  transition: color 200ms ease-out, background-color 200ms ease-out, border-color 200ms ease-out,
+    transform 200ms ease-out, box-shadow 200ms ease-out;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+.page-shell {
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 0 var(--space-2);
+}
+
+.section-grid {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(34, 211, 238, 0.12);
+  color: var(--accent);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 3vw + 1rem, 3.5rem);
+}
+
+h2 {
+  font-size: clamp(2rem, 2.5vw + 1rem, 2.75rem);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 1.25vw + 1rem, 1.5rem);
+}
+
+p {
+  color: var(--muted);
+}
+
+.text-muted {
+  color: var(--muted);
+}
+
+.shadow-elevated {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 }
 
 /* Modern scrollbar */
@@ -93,14 +188,15 @@ body {
 
 /* Glass morphism effect */
 .glass {
-  backdrop-filter: blur(16px) saturate(180%);
-  background-color: rgba(17, 25, 40, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.125);
+  backdrop-filter: blur(18px) saturate(170%);
+  background: linear-gradient(145deg, rgba(13, 17, 23, 0.82), rgba(9, 12, 20, 0.78));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 /* Gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, #10b981, #06b6d4);
+  background: linear-gradient(135deg, #22d3ee, #10b981);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -118,8 +214,8 @@ body {
 
 /* Loading spinner */
 .spinner {
-  border: 2px solid #374151;
-  border-top: 2px solid #10b981;
+  border: 2px solid #1f2937;
+  border-top: 2px solid var(--accent);
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -129,4 +225,12 @@ body {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -4,14 +4,50 @@ import Image from "next/image";
 import { useState } from "react";
 import { PROJECTS } from "@/data/projects";
 import { EXPERIENCE } from "@/data/experience";
+import { SKILLS } from "@/data/skills";
 import ContactInfo from "@/components/ContactInfo";
-
-const skills = [
-  "TypeScript", "Next.js", "Node.js", "MongoDB", "PostgreSQL",
-  "React", "Tailwind", "Docker", "AWS", "Security"
-];
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import Reveal from "@/components/ui/Reveal";
 
 export default function Home() {
+  const focusAreas = [
+    {
+      title: "Secure web apps",
+      body: "Full-stack builds with hardened auth, RBAC, and threat-aware APIs that ship fast and stay resilient.",
+      tags: ["Next.js", "Node.js", "Auth", "RBAC", "OWASP"],
+    },
+    {
+      title: "Data-rich experiences",
+      body: "Interactive dashboards, live filters, and data visualizations with crisp UX and low latency.",
+      tags: ["TypeScript", "React", "MongoDB", "PostgreSQL", "Caching"],
+    },
+    {
+      title: "AI & automation",
+      body: "Task-focused assistants, CV/OCR pipelines, and secure workflow bots with clear guardrails.",
+      tags: ["LangChain", "OpenCV", "FastAPI", "Messaging", "LLM Safety"],
+    },
+  ];
+
+  const deliverySteps = [
+    {
+      title: "Discover",
+      detail: "Clarify goals, constraints, and risks; align on success metrics and security posture.",
+    },
+    {
+      title: "Design",
+      detail: "Architecture, data flow, and UI states; define contracts and error paths before coding.",
+    },
+    {
+      title: "Build",
+      detail: "Incremental delivery with feature flags, accessibility passes, and perf budgets enforced.",
+    },
+    {
+      title: "Harden & launch",
+      detail: "Security review, load checks, and observability hooks so launches are predictable.",
+    },
+  ];
   const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -47,29 +83,25 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-black to-zinc-900">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <section className="animate-fade-in mb-20">
+        <Reveal className="mb-20">
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
             <div className="space-y-8">
               <div className="space-y-4">
-                <p className="text-sm font-medium tracking-wider text-emerald-400 uppercase">
-                  Yoftahe Yoseph
-                </p>
+                <p className="eyebrow">Yoftahe Yoseph</p>
                 <h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
-                  Full Stack Developer &
-                  <span className="gradient-text block">Security Expert</span>
+                  Full Stack Developer &<span className="gradient-text block">Security Expert</span>
                 </h1>
                 <p className="text-lg text-zinc-300 max-w-2xl">
-                  Building secure, scalable web applications with modern technologies.
-                  Passionate about clean code and cybersecurity best practices.
+                  Building secure, scalable products with a security-first mindset. I deliver fast UX, hardened APIs, and production-grade systems that are easy to evolve.
                 </p>
               </div>
               <div className="flex flex-wrap gap-4">
-                <a href="#contact" className="bg-emerald-500 hover:bg-emerald-400 text-black px-6 py-3 rounded-full font-semibold transition-all hover:scale-105">
-                  Get In Touch
-                </a>
-                <a href="#projects" className="border border-zinc-600 hover:border-emerald-400 text-white px-6 py-3 rounded-full font-semibold transition-all hover:bg-zinc-800">
-                  View Work
-                </a>
+                <Button href="#projects" icon={<span>↗</span>}>
+                  View Projects
+                </Button>
+                <Button href="/cv.pdf" variant="secondary">
+                  Download CV
+                </Button>
               </div>
             </div>
             <div className="flex justify-center lg:justify-end">
@@ -79,6 +111,7 @@ export default function Home() {
                   alt="Yoftahe Yoseph"
                   width={320}
                   height={320}
+                  sizes="(min-width: 1024px) 320px, 60vw"
                   className="w-80 h-80 rounded-3xl object-cover shadow-2xl ring-4 ring-emerald-400/30"
                   priority
                 />
@@ -88,39 +121,51 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </section>
+        </Reveal>
+
+        {/* Focus areas */}
+        <Reveal className="mb-20" id="focus">
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">What I build</h2>
+          <div className="grid gap-6 md:grid-cols-3">
+            {focusAreas.map((area) => (
+              <Card key={area.title} title={area.title} subtitle={area.body} className="h-full">
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {area.tags.map((tag) => (
+                    <Badge key={tag} variant="outline">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Reveal>
 
         {/* Projects */}
-        <section id="projects" className="mb-20 animate-slide-up">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">Featured Projects</h2>
+        <Reveal className="mb-20" id="projects">
+          <h2 className="text-3xl font-bold text-white mb-4 text-center">Featured Projects</h2>
+          <p className="text-center text-zinc-300 mb-8 max-w-3xl mx-auto">
+            A sample of shipped work across marketplaces, secure data exchange, computer vision, and task-focused assistants. All are production-minded with security and observability built in.
+          </p>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {PROJECTS.map((project, i) => (
-              <article key={project.title} className="glass rounded-2xl p-6 hover-lift group" style={{animationDelay: `${i * 0.1}s`}}>
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-semibold text-white group-hover:text-emerald-400 transition-colors">
-                    {project.title}
-                  </h3>
-                  <span className="bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-xs font-medium">
-                    Live
-                  </span>
-                </div>
-                <p className="text-zinc-300 text-sm mb-4">{project.description}</p>
+            {PROJECTS.map((project) => (
+              <Card key={project.title} title={project.title} subtitle={project.description} className="group" as="article">
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {project.tech.map(tech => (
-                    <span key={tech} className="bg-zinc-800 text-zinc-200 px-2 py-1 rounded text-xs">
+                  {project.tech.map((tech) => (
+                    <Badge key={tech} variant="outline">
                       {tech}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
                 {project.link && (
-                  <a href={project.link} className="text-emerald-400 hover:text-emerald-300 text-sm font-medium inline-flex items-center gap-1">
-                    View Project <span>↗</span>
-                  </a>
+                  <Button href={project.link} variant="outline" size="md" icon={<span>↗</span>}>
+                    View Project
+                  </Button>
                 )}
-              </article>
+              </Card>
             ))}
           </div>
-        </section>
+        </Reveal>
 
         {/* Experience & Contact */}
         <div className="grid gap-8 lg:grid-cols-3">
@@ -184,17 +229,13 @@ export default function Home() {
               {error && <p className="text-red-400 text-sm">{error}</p>}
               {formState === "success" && <p className="text-emerald-400 text-sm">Message sent successfully!</p>}
               
-              <button
-                type="submit"
-                disabled={formState === "loading"}
-                className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-black font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2"
-              >
+              <Button type="submit" fullWidth disabled={formState === "loading"}>
                 {formState === "loading" ? (
                   <><div className="spinner"></div> Sending...</>
                 ) : (
                   "Send Message"
                 )}
-              </button>
+              </Button>
             </form>
           </section>
         </div>
@@ -202,14 +243,28 @@ export default function Home() {
         {/* Skills */}
         <section className="mt-20 glass rounded-2xl p-8">
           <h2 className="text-2xl font-bold text-white mb-8 text-center">Tech Stack</h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {skills.map((skill, i) => (
-              <div key={skill} className="bg-zinc-800 hover:bg-zinc-700 rounded-lg p-4 text-center transition-all hover:scale-105" style={{animationDelay: `${i * 0.1}s`}}>
-                <span className="text-white font-medium">{skill}</span>
-              </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {SKILLS.map((group) => (
+              <Card key={group.category} title={group.category} className="bg-zinc-900/40">
+                <div className="flex flex-wrap gap-2">
+                  {group.items.map((item) => (
+                    <Badge key={item}>{item}</Badge>
+                  ))}
+                </div>
+              </Card>
             ))}
           </div>
         </section>
+
+        {/* Delivery approach */}
+        <Reveal className="mt-16 mb-12">
+          <h2 className="text-2xl font-bold text-white mb-6 text-center">How I deliver</h2>
+          <div className="grid gap-4 md:grid-cols-4">
+            {deliverySteps.map((step) => (
+              <Card key={step.title} title={step.title} subtitle={step.detail} className="h-full" />
+            ))}
+          </div>
+        </Reveal>
       </div>
     </div>
   );
